@@ -1,0 +1,74 @@
+name: 🚀 Release - Owner Only
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号 (例如: v2.3)'
+        required: true
+        type: string
+      prerelease:
+        description: '是否为预发布版本'
+        required: false
+        default: false
+        type: boolean
+      notes:
+        description: '发布说明'
+        required: true
+        type: string
+
+jobs:
+  authorize:
+    name: ✅ 权限检查
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检查仓库所有者权限
+        run: |
+          if [[ "${{ github.actor }}" != "hyyw2020" ]]; then
+            echo "❌ 错误：仅仓库所有者可以发起发布"
+            echo "触发者: ${{ github.actor }}"
+            exit 1
+          fi
+          echo "✅ 权限验证通过"
+
+  validate:
+    name: 📋 版本验证
+    runs-on: ubuntu-latest
+    needs: authorize
+    steps:
+      - name: 检查版本号格式
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if ! [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ 版本号格式错误: $VERSION"
+            exit 1
+          fi
+          echo "✅ 版本号验证通过: $VERSION"
+
+  create-release:
+    name: 🚀 创建 Release
+    runs-on: ubuntu-latest
+    needs: validate
+    permissions:
+      contents: write
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: 创建 GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: ${{ github.event.inputs.version }}
+          body: ${{ github.event.inputs.notes }}
+          prerelease: ${{ github.event.inputs.prerelease }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 发布完成通知
+        run: |
+          echo "🎉 Release 发布完成！"
+          echo "版本: ${{ github.event.inputs.version }}"
+          echo "发布地址: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }}"

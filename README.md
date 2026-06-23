@@ -1,4 +1,4 @@
-# bug11 - Windows 映像构建工具
+# bug11 - 充满bug的Windows 映像构建工具
 
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue)

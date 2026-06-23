@@ -1,0 +1,10 @@
+# bug11 项目代码所有者配置
+
+* @hyyw2020
+*.ps1 @hyyw2020
+.github/ @hyyw2020
+*.yml @hyyw2020
+*.md @hyyw2020
+LICENSE @hyyw2020
+CONTRIBUTING.md @hyyw2020
+CODE_OF_CONDUCT.md @hyyw2020
